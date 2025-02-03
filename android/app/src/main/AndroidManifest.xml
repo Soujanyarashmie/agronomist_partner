@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!-- If your application also needs to write to the external storage, include this permission -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application
         android:label="agronomist_partner"
         android:name="${applicationName}"

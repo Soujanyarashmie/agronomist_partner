@@ -23,7 +23,7 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
     // Navigate to next page after some delay
     Timer(const Duration(seconds: 3), () {
       if (mounted) {
-        context.go('/LocationPage');
+        context.go('/homepage');
       }
     });
   }
