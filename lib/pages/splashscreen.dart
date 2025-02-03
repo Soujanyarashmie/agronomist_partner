@@ -14,7 +14,7 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
   void initState() {
     super.initState();
     // Start opacity animation
-    Timer(const Duration(milliseconds: 100), () {
+    Timer(const Duration(milliseconds: 1000), () {
       setState(() {
         _opacity = 1.0;
       });
@@ -31,6 +31,7 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Center(
         child: AnimatedOpacity(
           opacity: _opacity,
