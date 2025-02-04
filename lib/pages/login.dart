@@ -39,19 +39,22 @@ class _LoginPageState extends State<LoginPage> {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
         final AuthCredential credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
 
-        final UserCredential userCredential = await _auth.signInWithCredential(credential);
+        final UserCredential userCredential =
+            await _auth.signInWithCredential(credential);
         if (userCredential.user != null) {
           print("Signed in as ${userCredential.user!.displayName}");
 
           // Retrieve email and profile image URL from the user credential
           final String email = userCredential.user!.email ?? "No email found";
-          final String imageUrl = userCredential.user!.photoURL ?? "No image available";
+          final String imageUrl =
+              userCredential.user!.photoURL ?? "No image available";
 
           // Update UserData singleton with the new user information
           UserData().update(email, imageUrl);
@@ -93,11 +96,16 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   height: 50,
                   child: OutlinedButton(
-                    onPressed: signInWithGoogle,
+                    // onPressed: signInWithGoogle,
+                    onPressed: () {
+                      context.push('/mainpage');
+                    },
                     child: const Text("Sign in with Google"),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Theme.of(context).colorScheme.secondary),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      side: BorderSide(
+                          color: Theme.of(context).colorScheme.secondary),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
                 ),
