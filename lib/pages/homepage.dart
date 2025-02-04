@@ -1,69 +1,89 @@
+
+import 'package:agronomist_partner/backend/go_router.dart';
+import 'package:agronomist_partner/pages/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Firebase Upload',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: ProductUploadPage(),
-    );
-  }
-}
 
 class ProductUploadPage extends StatefulWidget {
+  
+
+  const ProductUploadPage({super.key,});
+
   @override
   _ProductUploadPageState createState() => _ProductUploadPageState();
 }
+
 
 class _ProductUploadPageState extends State<ProductUploadPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
+  final UserData userData = UserData();
 
-  // Upload product data to Firestore
-  Future<void> uploadProduct() async {
-    if (nameController.text.isNotEmpty &&
-        descriptionController.text.isNotEmpty &&
-        priceController.text.isNotEmpty) {
-      try {
-        // Store data in Firestore
-        await FirebaseFirestore.instance.collection('products').add({
-          'name': nameController.text,
-          'description': descriptionController.text,
-          'price': double.parse(priceController.text),
-          'timestamp': FieldValue.serverTimestamp(),
-        });
+ Future<void> uploadProduct() async {
+  if (nameController.text.isNotEmpty &&
+      descriptionController.text.isNotEmpty &&
+      priceController.text.isNotEmpty) {
+    try {
+      // Adding to a subcollection 'products' under the specific user's email
+      await FirebaseFirestore.instance
+          .collection(userData.email)
+          .doc('products') // Adding a document with ID 'products'
+          .collection('products') // Creating/Using a subcollection named 'products'
+          .add({
+            'name': nameController.text,
+            'description': descriptionController.text,
+            'price': double.parse(priceController.text),
+            'timestamp': FieldValue.serverTimestamp(),
+            'email': userData.email,
+          });
 
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Product uploaded successfully!')));
-
-        // Clear the form
-        nameController.clear();
-        descriptionController.clear();
-        priceController.clear();
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill in all fields.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Product uploaded successfully!')));
+      nameController.clear();
+      descriptionController.clear();
+      priceController.clear();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill in all fields.')));
   }
+}
+
+  // Future<void> logout() async {
+  //   await FirebaseAuth.instance.signOut();
+  //   context.go('/loginpage');
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Upload Product')),
+    appBar: AppBar(
+  title: Text('Upload Product'),
+  actions: [
+    InkWell(
+      onTap: () {
+        
+       context.push('/profilepage');
+      },
+      child: userData.imageUrl.isNotEmpty
+          ? CircleAvatar(
+              backgroundImage: NetworkImage(userData.imageUrl),
+              radius: 25, // Radius of 15 will create a diameter of 30
+            )
+          : CircleAvatar(
+              child: Text("No"),
+              radius: 25,
+            ),
+    ),
+    SizedBox(width: 20), // Add some spacing after the profile image
+  ],
+),
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -86,6 +106,10 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
               onPressed: uploadProduct,
               child: Text('Upload Product'),
             ),
+            SizedBox(height: 20),
+            Text("Logged in as ${userData.email}"),
+            SizedBox(height: 10),
+            
           ],
         ),
       ),

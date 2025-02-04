@@ -12,7 +12,20 @@
           "package_name": "com.example.agronomist_partner"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "120223803296-hjai4vt0gi3r58nc1j9f5gt8v0fhb0gj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.agronomist_partner",
+            "certificate_hash": "7d932be5f9e85f246f8bc4bda96b40e529fa7d10"
+          }
+        },
+        {
+          "client_id": "120223803296-soq4i095rvmnr9mprgebgl98m695deg1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBxYDIP56gUAslnuRjPJDhs6gkLS4xgFK0"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "120223803296-soq4i095rvmnr9mprgebgl98m695deg1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
