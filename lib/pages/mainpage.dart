@@ -1,4 +1,7 @@
+import 'package:agronomist_partner/backend/go_router.dart';
+import 'package:agronomist_partner/pages/login.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MainPage extends StatelessWidget {
   @override
@@ -10,19 +13,35 @@ class MainPage extends StatelessWidget {
         children: [
           SearchBarWidget(),
           SizedBox(height: 25),
-          ContainerWidget(
-              imagePath: "assets/images/buyproduct.jpg", label: "Buy Products"),
+          InkWell(
+            onTap: () {
+             
+            },
+            child: ContainerWidget(
+              imagePath: "assets/images/buyproduct.jpg", 
+              label: "Buy Products"
+            ),
+          ),
           SizedBox(height: 30),
-          ContainerWidget(
+          InkWell(
+            onTap: () {
+            context.push('/homepage');
+             
+            },
+            child: ContainerWidget(
               imagePath: "assets/images/sellproduct.jpg",
-              label: "Sell Products"),
+              label: "Sell Products"
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
+
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final UserData userData = UserData();
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -55,11 +74,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],
         ),
         actions: [
-          CircleAvatar(
-            backgroundImage: AssetImage("assets/profile_image.png"),
-          ),
-          SizedBox(width: 10),
-        ],
+  InkWell(
+    onTap: () {
+      context.push('/profilemenu');
+    },
+    child: CircleAvatar(
+      backgroundImage: NetworkImage(userData.imageUrl),
+    ),
+  ),
+  SizedBox(width: 10),
+]
+
       ),
     );
   }
@@ -113,19 +138,20 @@ class ContainerWidget extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 10,
+          top: 5,
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(10),
-            ),
+            // decoration: BoxDecoration(
+            //   color: Colors.white.withOpacity(0.2),
+            //   borderRadius: BorderRadius.circular(10),
+            // ),
             child: Text(
               label,
               style: TextStyle(
                 color: Colors.brown[600],
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                fontStyle: FontStyle.normal,
+                fontSize: 15,
               ),
             ),
           ),

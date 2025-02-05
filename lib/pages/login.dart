@@ -13,10 +13,12 @@ class UserData {
 
   String email = '';
   String imageUrl = '';
+  String name ='';
 
-  void update(String email, String imageUrl) {
+  void update(String email, String imageUrl, String name) {
     this.email = email;
     this.imageUrl = imageUrl;
+    this.name = name;
     print('User Data Updated: email=$email, imageUrl=$imageUrl');
   }
 }
@@ -55,12 +57,12 @@ class _LoginPageState extends State<LoginPage> {
           final String email = userCredential.user!.email ?? "No email found";
           final String imageUrl =
               userCredential.user!.photoURL ?? "No image available";
-
           // Update UserData singleton with the new user information
-          UserData().update(email, imageUrl);
+          final String name = userCredential.user!.displayName ?? "No name found";
+          UserData().update(email, imageUrl, name);
 
           // Navigate to the main page after successful login
-          context.go('/homepage');
+          context.go('/location');
         }
       }
     } catch (e) {
@@ -96,10 +98,10 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   height: 50,
                   child: OutlinedButton(
-                    // onPressed: signInWithGoogle,
-                    onPressed: () {
-                      context.push('/mainpage');
-                    },
+                    onPressed: signInWithGoogle,
+                    // onPressed: () {
+                    //   context.push('/mainpage');
+                    //},
                     child: const Text("Sign in with Google"),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(

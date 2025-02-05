@@ -1,4 +1,3 @@
-
 import 'package:agronomist_partner/backend/go_router.dart';
 import 'package:agronomist_partner/pages/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,52 +6,56 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-
 class ProductUploadPage extends StatefulWidget {
-  
-
-  const ProductUploadPage({super.key,});
+final UserData userData = UserData();
+ProductUploadPage({super.key,});
 
   @override
   _ProductUploadPageState createState() => _ProductUploadPageState();
 }
-
 
 class _ProductUploadPageState extends State<ProductUploadPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final UserData userData = UserData();
-
  Future<void> uploadProduct() async {
   if (nameController.text.isNotEmpty &&
       descriptionController.text.isNotEmpty &&
-      priceController.text.isNotEmpty) {
+      priceController.text.isNotEmpty && userData.email != null) {
     try {
-      // Adding to a subcollection 'products' under the specific user's email
+      double price = double.tryParse(priceController.text) ?? 0;
+      if (price <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter a valid price')));
+        return;
+      }
+      String sanitizedEmail = userData.email.replaceAll('.', ','); // Sanitizing email for Firestore compatibility
       await FirebaseFirestore.instance
-          .collection(userData.email)
-          .doc('products') // Adding a document with ID 'products'
-          .collection('products') // Creating/Using a subcollection named 'products'
+          .collection('user_products') // General collection for all user products
+          .doc(sanitizedEmail) // Using sanitized email as document ID
+          .collection('products') // Sub-collection for specific user's products
           .add({
             'name': nameController.text,
             'description': descriptionController.text,
-            'price': double.parse(priceController.text),
+            'price': price,
             'timestamp': FieldValue.serverTimestamp(),
-            'email': userData.email,
+            'email': userData.email, // Storing original email in the product details
           });
-
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Product uploaded successfully!')));
       nameController.clear();
       descriptionController.clear();
       priceController.clear();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      print(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error uploading product: $e')));
     }
   } else {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill in all fields.')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill in all fields')));
   }
 }
+
+
+
 
   // Future<void> logout() async {
   //   await FirebaseAuth.instance.signOut();
@@ -62,12 +65,14 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.yellow[50],
     appBar: AppBar(
+      backgroundColor: Colors.green[100],
   title: Text('Upload Product'),
   actions: [
     InkWell(
       onTap: () {
-        
+
        context.push('/profilepage');
       },
       child: userData.imageUrl.isNotEmpty
@@ -80,7 +85,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
               radius: 25,
             ),
     ),
-    SizedBox(width: 20), // Add some spacing after the profile image
+    SizedBox(width: 20), 
   ],
 ),
 
@@ -107,9 +112,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
               child: Text('Upload Product'),
             ),
             SizedBox(height: 20),
-            Text("Logged in as ${userData.email}"),
-            SizedBox(height: 10),
-            
+           
           ],
         ),
       ),
