@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "120223803296-4scfhd8vqsspv8shl61mdp64u220anf1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.agronomist_partner",
+            "certificate_hash": "26a639f85ae9a3dc7cafe8615431deee6931586f"
+          }
+        },
+        {
           "client_id": "120223803296-hjai4vt0gi3r58nc1j9f5gt8v0fhb0gj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
