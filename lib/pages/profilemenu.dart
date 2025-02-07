@@ -9,7 +9,7 @@ class ProfileMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final double avatarRadius = 50;
     final double appBarHeight = 150;
-    final UserData userData = UserData(); 
+    final UserData userData = UserData();
 
     return Scaffold(
       backgroundColor: Colors.yellow[50],
@@ -49,7 +49,8 @@ class ProfileMenu extends StatelessWidget {
                     ),
                   ],
                   flexibleSpace: LayoutBuilder(
-                    builder: (BuildContext context, BoxConstraints constraints) {
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
                       return Stack(
                         alignment: Alignment.center,
                         children: [
@@ -86,6 +87,7 @@ class ProfileMenu extends StatelessWidget {
                     SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: () {
+                        context.push('/editprofile');
                         // Edit profile action
                       },
                       style: ElevatedButton.styleFrom(
