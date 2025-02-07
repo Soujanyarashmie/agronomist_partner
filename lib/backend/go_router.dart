@@ -1,4 +1,6 @@
+import 'package:agronomist_partner/pages/address.dart';
 import 'package:agronomist_partner/pages/listedproducts.dart';
+import 'package:agronomist_partner/pages/myaddress.dart';
 import 'package:agronomist_partner/pages/productadding.dart';
 import 'package:agronomist_partner/pages/sellproduct.dart';
 import 'package:agronomist_partner/pages/location.dart';
@@ -52,5 +54,13 @@ final GoRouter router = GoRouter(initialLocation: '/splashscreen', routes: [
    GoRoute(
     path: '/productupload',
     builder: (context, state) => ProductUploadPage(),
+  ),
+   GoRoute(
+    path: '/addaddress',
+    builder: (context, state) => AddAddressScreen(),
+  ),
+   GoRoute(
+    path: '/myaddress',
+    builder: (context, state) => MyAddressPage(),
   ),
 ]);

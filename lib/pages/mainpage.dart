@@ -15,7 +15,8 @@ class MainPage extends StatelessWidget {
           SizedBox(height: 25),
           InkWell(
             onTap: () {
-             
+              print('tapped');
+             context.push('/address');
             },
             child: ContainerWidget(
               imagePath: "assets/images/buyproduct.jpg", 

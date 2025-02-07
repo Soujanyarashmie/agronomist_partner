@@ -1,4 +1,3 @@
-
 import 'package:agronomist_partner/components/bottomappbar.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -22,7 +21,7 @@ class Sellproduct extends StatelessWidget {
         backgroundColor: Colors.green[100],
       ),
       body: Container(
-        color: Colors.yellow[50], // Set the color for the entire body background
+        color: Colors.yellow[50],
         child: Column(
           children: [
             CarouselSlider(
@@ -30,7 +29,7 @@ class Sellproduct extends StatelessWidget {
                 height: 190,
                 autoPlay: true,
                 enlargeCenterPage: true,
-                viewportFraction: 1.0, // Ensures images stretch to fill the space
+                viewportFraction: 1.0,
               ),
               items: imageUrls.map((url) {
                 return Container(
@@ -46,42 +45,47 @@ class Sellproduct extends StatelessWidget {
                 );
               }).toList(),
             ),
-          Expanded(
-  child: Container(
-    alignment: Alignment.topLeft, // Aligns the child to the top left
-    padding: EdgeInsets.all(10.0), // Add padding around the content
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start, // Aligns children to the start of the column (left)
-      children: [
-        Text(
-          "List Your Products",
-          style: TextStyle(
-            fontSize: 17.0, // Adjust the font size as needed
-            fontWeight: FontWeight.w500, // Set the font weight to medium
-            color: Colors.black, // Set the text color to black
-          ),
-        ),
-        SizedBox(height: 5,),
-        Divider(color:Colors.grey[300],),
-        // Space between text and image
-        GestureDetector(
-  onTap: () {
-    context.push('/productupload');
-    // Handle the tap event here
-    print('Image Tapped!'); // Example action: printing to console
-  },
-  child: Image.asset(
-    'assets/images/addmore1.png', // Ensure this path is correct
-    width: 100,
-    height: 100,
-  ),
-)
-
-      ],
-    ),
-  ),
-)
-
+            Expanded(
+              child: Container(
+                alignment: Alignment.topLeft,
+                padding: EdgeInsets.all(10.0), // Add padding around the content
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment
+                      .start, // Aligns children to the start of the column (left)
+                  children: [
+                    Text(
+                      "List Your Products",
+                      style: TextStyle(
+                        fontSize: 17.0, // Adjust the font size as needed
+                        fontWeight:
+                            FontWeight.w500, // Set the font weight to medium
+                        color: Colors.black, // Set the text color to black
+                      ),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Divider(
+                      color: Colors.grey[300],
+                    ),
+                    // Space between text and image
+                    GestureDetector(
+                      onTap: () {
+                        context.push('/productupload');
+                        // Handle the tap event here
+                        print(
+                            'Image Tapped!'); // Example action: printing to console
+                      },
+                      child: Image.asset(
+                        'assets/images/addmore1.png', // Ensure this path is correct
+                        width: 100,
+                        height: 100,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            )
           ],
         ),
       ),

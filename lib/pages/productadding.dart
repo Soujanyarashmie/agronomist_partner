@@ -57,10 +57,7 @@ class _ProductUploadPageState extends State<ProductUploadPage> {
 
 
 
-  // Future<void> logout() async {
-  //   await FirebaseAuth.instance.signOut();
-  //   context.go('/loginpage');
-  // }
+  
 
   @override
   Widget build(BuildContext context) {
