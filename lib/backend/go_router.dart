@@ -58,14 +58,43 @@ final GoRouter router = GoRouter(initialLocation: '/splashscreen', routes: [
   ),
   GoRoute(
     path: '/addaddress',
-    builder: (context, state) => AddAddressScreen(),
+    builder: (context, state) => MyAddressPage(),
   ),
   GoRoute(
-    path: '/myaddress',
-    builder: (context, state) => MyAddressPage(),
+    path: '/myaddress1',
+    builder: (context, state) => const AddressForm(),
   ),
   GoRoute(
     path: '/editprofile',
     builder: (context, state) => EditProfileScreen(),
   ),
-]);
+  GoRoute(
+    path: '/myaddress',
+    builder: (context, state) => MyAddressPage(),
+  ),
+   GoRoute(
+      path: '/',
+      builder: (context, state) => MyAddressPage(),
+    ),
+    GoRoute(
+      path: '/addnewaddress',
+      builder: (context, state) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Add New Address'),
+        ), 
+         body: AddressForm(),
+      ),
+    ),
+  ],
+); 
+
+
+
+
+
+
+
+
+
+
+

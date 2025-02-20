@@ -1,4 +1,4 @@
-import 'package:agronomist_partner/backend/go_router.dart';
+import 'package:agronomist_partner/pages/address.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,7 +28,16 @@ class MyAddressPage extends StatelessWidget {
         color: Colors.transparent,
         child: GestureDetector(
           onTap: () {
-           context.push('/addaddress');
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => Scaffold(
+                  appBar: AppBar(
+                    title: Text('Add New Address'),
+                  ),
+                  body: AddressForm(),
+                ),
+              ),
+            );
           },
           child: Container(
             width: 300,
