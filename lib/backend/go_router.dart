@@ -90,10 +90,10 @@ final GoRouter router = GoRouter(
           path: '/productupload',
           builder: (context, state) => ProductUploadPage(),
         ),
-        GoRoute(
-          path: '/addaddress',
-          builder: (context, state) => AddAddressScreen(),
-        ),
+        // GoRoute(
+        //   path: '/addaddress',
+        //   builder: (context, state) => AddAddressScreen(),
+        // ),
         GoRoute(
           path: '/myaddress',
           builder: (context, state) => MyAddressPage(),

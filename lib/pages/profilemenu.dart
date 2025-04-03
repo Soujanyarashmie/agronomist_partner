@@ -92,7 +92,7 @@ class ProfileMenu extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        backgroundColor: Colors.green[400],
+                        backgroundColor: Colors.green[300],
                       ),
                       child: Text('Edit Profile'),
                     ),

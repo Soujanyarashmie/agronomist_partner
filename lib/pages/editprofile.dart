@@ -37,7 +37,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             clipBehavior: Clip.none,
             children: [
               Container(
-                height: 70,
+                height: 70.0,
                 decoration: BoxDecoration(
                   color: Colors.green[100],
                   borderRadius:
