@@ -28,7 +28,7 @@ class MyAddressPage extends StatelessWidget {
         color: Colors.transparent,
         child: GestureDetector(
           onTap: () {
-           context.push('/addaddress');
+            context.push('/addaddress');
           },
           child: Container(
             width: 300,

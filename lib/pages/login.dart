@@ -3,23 +3,50 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // User Data Singleton
 class UserData {
   static final UserData _instance = UserData._internal();
   factory UserData() => _instance;
-
   UserData._internal();
 
   String email = '';
   String imageUrl = '';
-  String name ='';
+  String name = '';
+  bool isLoggedIn = false;
 
-  void update(String email, String imageUrl, String name) {
+  Future<void> init() async {
+    final prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('email') ?? '';
+    imageUrl = prefs.getString('imageUrl') ?? '';
+    name = prefs.getString('name') ?? '';
+    isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  }
+
+  Future<void> update(String email, String imageUrl, String name, bool isLoggedIn) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', email);
+    await prefs.setString('imageUrl', imageUrl);
+    await prefs.setString('name', name);
+    await prefs.setBool('isLoggedIn', isLoggedIn);
+    
     this.email = email;
     this.imageUrl = imageUrl;
     this.name = name;
-    print('User Data Updated: email=$email, imageUrl=$imageUrl');
+    this.isLoggedIn = isLoggedIn;
+    print('User Data Updated: email=$email, isLoggedIn=$isLoggedIn');
+  }
+
+  Future<void> logout() async {
+    await FirebaseAuth.instance.signOut();
+    await GoogleSignIn().signOut();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    email = '';
+    imageUrl = '';
+    name = '';
+    isLoggedIn = false;
   }
 }
 
@@ -33,46 +60,49 @@ class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isSigningIn = false;
 
-  Future<void> signInWithGoogle() async {
-    setState(() {
-      _isSigningIn = true;
-    });
+Future<void> signInWithGoogle() async {
+  setState(() => _isSigningIn = true);
+  
+  try {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser != null) {
+      final GoogleSignInAuthentication googleAuth = 
+          await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
-        final AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
+      final UserCredential userCredential = 
+          await _auth.signInWithCredential(credential);
+      
+      if (userCredential.user != null) {
+        final user = userCredential.user!;
+        await UserData().update(
+          user.email ?? '',
+          user.photoURL ?? '',
+          user.displayName ?? '',
+          true,
         );
-
-        final UserCredential userCredential =
-            await _auth.signInWithCredential(credential);
-        if (userCredential.user != null) {
-          print("Signed in as ${userCredential.user!.displayName}");
-
-          // Retrieve email and profile image URL from the user credential
-          final String email = userCredential.user!.email ?? "No email found";
-          final String imageUrl =
-              userCredential.user!.photoURL ?? "No image available";
-          // Update UserData singleton with the new user information
-          final String name = userCredential.user!.displayName ?? "No name found";
-          UserData().update(email, imageUrl, name);
-
-          // Navigate to the main page after successful login
+        
+        if (mounted) {
           context.go('/location');
         }
       }
-    } catch (e) {
-      print("Error signing in with Google: $e");
-    } finally {
-      setState(() {
-        _isSigningIn = false;
-      });
+    }
+  } catch (e) {
+    print("Error signing in with Google: $e");
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign in failed: ${e.toString()}')),
+      );
+    }
+  } finally {
+    if (mounted) {
+      setState(() => _isSigningIn = false);
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
