@@ -1,15 +1,10 @@
-import 'package:agronomist_partner/pages/address.dart';
 import 'package:agronomist_partner/pages/editprofile.dart';
-import 'package:agronomist_partner/pages/listedproducts.dart';
-import 'package:agronomist_partner/pages/myaddress.dart';
-import 'package:agronomist_partner/pages/productadding.dart';
-import 'package:agronomist_partner/pages/sellproduct.dart';
-import 'package:agronomist_partner/pages/location.dart';
+
 import 'package:agronomist_partner/pages/login.dart';
 import 'package:agronomist_partner/pages/mainpage.dart';
 import 'package:agronomist_partner/pages/profilemenu.dart';
 import 'package:agronomist_partner/pages/profilepage.dart';
-import 'package:agronomist_partner/pages/splashscreen.dart';
+import 'package:agronomist_partner/pages/splash_screen/splashscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -43,11 +38,11 @@ final GoRouter router = GoRouter(
     // Public routes
     GoRoute(
       path: '/splashscreen',
-      builder: (context, state) =>  SplashScreenWidget(),
+      builder: (context, state) => SplashScreenWidget(),
     ),
     GoRoute(
       path: '/loginpage',
-      builder: (context, state) =>  LoginPage(),
+      builder: (context, state) => LoginPage(),
     ),
 
     // Protected routes (require authentication)
@@ -57,18 +52,8 @@ final GoRouter router = GoRouter(
       },
       routes: [
         GoRoute(
-          path: '/homepage',
-          builder: (BuildContext context, GoRouterState state) {
-            return  Sellproduct();
-          },
-        ),
-        GoRoute(
-          path: '/location',
-          builder: (context, state) => const Location(),
-        ),
-        GoRoute(
           path: '/profilepage',
-          builder: (context, state) =>  ProfilePage(),
+          builder: (context, state) => ProfilePage(),
         ),
         GoRoute(
           path: '/mainpage',
@@ -77,26 +62,6 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/profilemenu',
           builder: (context, state) => ProfileMenu(),
-        ),
-        GoRoute(
-          path: '/listedproduct',
-          builder: (context, state) =>  ProductListPage(),
-        ),
-        GoRoute(
-          path: '/sellproduct',
-          builder: (context, state) => Sellproduct(),
-        ),
-        GoRoute(
-          path: '/productupload',
-          builder: (context, state) => ProductUploadPage(),
-        ),
-        // GoRoute(
-        //   path: '/addaddress',
-        //   builder: (context, state) => AddAddressScreen(),
-        // ),
-        GoRoute(
-          path: '/myaddress',
-          builder: (context, state) => MyAddressPage(),
         ),
         GoRoute(
           path: '/editprofile',
