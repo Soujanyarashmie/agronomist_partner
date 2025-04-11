@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class WelcomeScreen extends StatelessWidget {
   @override
@@ -43,7 +44,7 @@ class WelcomeScreen extends StatelessWidget {
                 width: MediaQuery.of(context).size.width * 0.7,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Handle sign in action
+                    context.go('/loginpage');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
