@@ -4,7 +4,10 @@ import 'package:agronomist_partner/pages/login.dart';
 import 'package:agronomist_partner/pages/mainpage.dart';
 import 'package:agronomist_partner/pages/profilemenu.dart';
 import 'package:agronomist_partner/pages/profilepage.dart';
+
+
 import 'package:agronomist_partner/pages/splash_screen/splashscreen.dart';
+import 'package:agronomist_partner/pages/welcomescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,7 +26,7 @@ final GoRouter router = GoRouter(
 
     // If not logged in and not going to login page, redirect to login
     if (!isLoggedIn && !isLoggingIn) {
-      return '/loginpage';
+      return '/welcomescreen';
     }
 
     // If logged in and trying to go to login page, redirect to home
@@ -66,6 +69,10 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/editprofile',
           builder: (context, state) => EditProfileScreen(),
+        ),
+        GoRoute(
+          path: '/welcomescreen',
+          builder: (context, state) => WelcomeScreen(),
         ),
       ],
     ),
