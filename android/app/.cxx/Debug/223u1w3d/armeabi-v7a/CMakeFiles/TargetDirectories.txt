@@ -1,0 +1,2 @@
+C:/Users/SOUJANYA/agronomist_partner/android/app/.cxx/Debug/223u1w3d/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/SOUJANYA/agronomist_partner/android/app/.cxx/Debug/223u1w3d/armeabi-v7a/CMakeFiles/rebuild_cache.dir

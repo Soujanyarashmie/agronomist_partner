@@ -1,0 +1,2 @@
+C:/Users/SOUJANYA/agronomist_partner/android/app/.cxx/Debug/223u1w3d/x86/CMakeFiles/edit_cache.dir
+C:/Users/SOUJANYA/agronomist_partner/android/app/.cxx/Debug/223u1w3d/x86/CMakeFiles/rebuild_cache.dir
