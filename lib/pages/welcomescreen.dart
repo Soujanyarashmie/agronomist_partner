@@ -44,7 +44,7 @@ class WelcomeScreen extends StatelessWidget {
                 width: MediaQuery.of(context).size.width * 0.7,
                 child: ElevatedButton(
                   onPressed: () {
-                    context.go('/loginpage');
+                    context.push('/loginpage');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,

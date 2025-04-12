@@ -1,10 +1,10 @@
 import 'package:agronomist_partner/pages/editprofile.dart';
 
 import 'package:agronomist_partner/pages/login.dart';
+
 import 'package:agronomist_partner/pages/mainpage.dart';
 import 'package:agronomist_partner/pages/profilemenu.dart';
 import 'package:agronomist_partner/pages/profilepage.dart';
-
 
 import 'package:agronomist_partner/pages/splash_screen/splashscreen.dart';
 import 'package:agronomist_partner/pages/welcomescreen.dart';
@@ -60,7 +60,7 @@ final GoRouter router = GoRouter(
         ),
         GoRoute(
           path: '/mainpage',
-          builder: (context, state) => MainPage(),
+          builder: (context, state) => HomePage(),
         ),
         GoRoute(
           path: '/profilemenu',
@@ -74,6 +74,7 @@ final GoRouter router = GoRouter(
           path: '/welcomescreen',
           builder: (context, state) => WelcomeScreen(),
         ),
+       
       ],
     ),
   ],

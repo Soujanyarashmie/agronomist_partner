@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
@@ -217,37 +218,134 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
+      body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Login Account",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      left: 0), // Move 8 pixels more to the left
+                  child: IconButton(
+                    icon: Icon(Icons.close ,size: 25,color: Colors.red[500]),
+                    onPressed: () {
+                      context.pop();
+                    },
+                  ),
+                ),
               ),
-              const SizedBox(height: 20),
+
+              SizedBox(height: 20),
+              Text(
+                'How do you want to log in?',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 30),
+
+              // Continue with Email
               if (_isSigningIn)
                 const CircularProgressIndicator()
               else
                 SizedBox(
                   width: double.infinity,
-                  height: 50,
-                  child: OutlinedButton(
+                  height: 55,
+                  child: ElevatedButton.icon(
                     onPressed: signInWithGoogle,
-                    child: const Text("Sign in with Google"),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                          color: Theme.of(context).colorScheme.secondary),
+                    icon: Image.asset(
+                      'assets/images/google.png',
+                      width: 25,
+                      height: 25,
+                    ),
+                    label: Text(
+                      'Continue with email',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.lightBlueAccent,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
                   ),
                 ),
+
+              SizedBox(height: 16),
+
+              // Continue with Facebook
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    // Facebook login
+                  },
+                  icon: FaIcon(FontAwesomeIcons.facebookF, color: Colors.white),
+                  label: Text(
+                    'Continue with Facebook',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF4267B2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 16),
+
+              // Continue with Apple
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    // Apple login
+                  },
+                  icon: FaIcon(FontAwesomeIcons.apple, color: Colors.white),
+                  label: Text(
+                    'Continue with Apple',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ),
+              ),
+
+              Spacer(),
+
+              Center(
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        // Navigate to Sign Up
+                      },
+                      child: Text(
+                        'Terms & conditions',
+                        style: TextStyle(
+                          color: Colors.lightBlue,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

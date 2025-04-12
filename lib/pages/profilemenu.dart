@@ -130,7 +130,7 @@ class ProfileMenu extends StatelessWidget {
   // Moved _logout function outside the build method
   Future<void> _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
-    context.go('/loginpage');
+    context.go('/welcomescreen');
   }
 
   Widget buildAccountInfoList(BuildContext context) {
