@@ -31,13 +31,13 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.brown [300],
+      backgroundColor: Color(0xFFEB2226),
       body: Center(
         child: AnimatedOpacity(
           opacity: _opacity,
-          duration: const Duration(seconds: 2),
+          duration: const Duration(seconds: 4),
           child: Image.asset(
-              'assets/images/agrilogo1.png'), // Correct the asset path as needed
+              'assets/images/splash.png'), // Correct the asset path as needed
         ),
       ),
     );

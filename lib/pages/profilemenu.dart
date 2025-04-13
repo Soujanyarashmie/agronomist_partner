@@ -12,7 +12,7 @@ class ProfileMenu extends StatelessWidget {
     final UserData userData = UserData();
 
     return Scaffold(
-      backgroundColor: Colors.yellow[50],
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Column(
@@ -22,7 +22,7 @@ class ProfileMenu extends StatelessWidget {
                 height: appBarHeight,
                 padding: const EdgeInsets.only(top: 28.0),
                 decoration: BoxDecoration(
-                  color: Colors.green[100],
+                  color: Color(0xFF1B4EA0),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black26,
@@ -32,14 +32,14 @@ class ProfileMenu extends StatelessWidget {
                   ],
                 ),
                 child: AppBar(
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: Color(0xFF1B4EA0),
                   elevation: 0,
                   centerTitle: true,
                   title: Container(),
-                  leading: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
+                  // leading: IconButton(
+                  //   icon: Icon(Icons.arrow_back, color: Colors.white),
+                  //   onPressed: () => Navigator.pop(context),
+                  // ),
                   actions: [
                     IconButton(
                       icon: Icon(Icons.settings, color: Colors.white),
@@ -92,7 +92,7 @@ class ProfileMenu extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        backgroundColor: Colors.green[300],
+                        backgroundColor: Color(0xFF1B4EA0),
                       ),
                       child: Text('Edit Profile'),
                     ),
@@ -136,42 +136,7 @@ class ProfileMenu extends StatelessWidget {
   Widget buildAccountInfoList(BuildContext context) {
     return Column(
       children: [
-        buildAccountInfoTile(
-          context,
-          icon: Icons.home,
-          color: Colors.grey,
-          title: 'My Addresses',
-          onTap: () {
-            context.push('/myaddress');
-          },
-        ),
-        buildAccountInfoTile(
-          context,
-          icon: Icons.shopping_bag,
-          color: Colors.grey,
-          title: 'Cart',
-          onTap: () {
-            // Navigate to Cart screen
-          },
-        ),
-        buildAccountInfoTile(
-          context,
-          icon: Icons.support,
-          color: Colors.red,
-          title: 'Support',
-          onTap: () {
-            // Navigate to Support screen
-          },
-        ),
-        buildAccountInfoTile(
-          context,
-          icon: Icons.language,
-          color: Colors.blue,
-          title: 'Website',
-          onTap: () {
-            // Open Website
-          },
-        ),
+     
         buildAccountInfoTile(
           context,
           icon: Icons.logout,

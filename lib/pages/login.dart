@@ -40,7 +40,6 @@ Future<void> addProduct(Map<String, dynamic> productData) async {
   }
 }
 
-// User Data Singleton
 class UserData {
   static final UserData _instance = UserData._internal();
   factory UserData() => _instance;
@@ -50,6 +49,11 @@ class UserData {
   String imageUrl = '';
   String name = '';
   bool isLoggedIn = false;
+
+  // 👇 Add these new fields
+  String phone = '';
+  String dob = '';
+  List<String> about = [];
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
@@ -74,6 +78,17 @@ class UserData {
     print('User Data Updated: email=$email, isLoggedIn=$isLoggedIn');
   }
 
+  Future<String> getFirebaseToken() async {
+    final user = FirebaseAuth.instance.currentUser;
+    return await user?.getIdToken() ?? '';
+  }
+
+   Future<String> getFirebaseUid() async {
+  final user = FirebaseAuth.instance.currentUser;
+  return user?.uid ?? '';
+}
+
+
   Future<void> logout() async {
     await FirebaseAuth.instance.signOut();
     await GoogleSignIn().signOut();
@@ -83,6 +98,9 @@ class UserData {
     imageUrl = '';
     name = '';
     isLoggedIn = false;
+    phone = '';
+    dob = '';
+    about = [];
   }
 }
 
@@ -161,40 +179,6 @@ class _LoginPageState extends State<LoginPage> {
             print('❌ Response body: ${response.body}');
           }
 
-          // ✅ POST hardcoded product data
-          final productResponse = await http.post(
-            Uri.parse(
-                'https://cloths-api-backend.onrender.com/api/v1/products'),
-            headers: {
-              'Authorization': 'Bearer $token',
-              'Content-Type': 'application/json',
-            },
-            body: const JsonEncoder().convert({
-              "name": "Cool T-Shirt",
-              "price": 29.99,
-              "description": "A super cool t-shirt with minimal design",
-              "category": "T-Shirts",
-              "stock": 20,
-              "seller": "Flutter App",
-              "ratings": 4.5,
-              "ratingcount": 12,
-              "images": [
-                {
-                  "url": "https://example.com/image1.jpg",
-                }
-              ],
-              "isfavourite": false,
-            }),
-          );
-
-          if (productResponse.statusCode == 201 ||
-              productResponse.statusCode == 200) {
-            print("✅ Product added successfully: ${productResponse.body}");
-          } else {
-            print("❌ Failed to add product: ${productResponse.statusCode}");
-            print("❌ Response: ${productResponse.body}");
-          }
-
           // 👉 Navigate after backend tasks
           if (mounted) {
             context.go('/mainpage');
@@ -231,7 +215,7 @@ class _LoginPageState extends State<LoginPage> {
                   padding: EdgeInsets.only(
                       left: 0), // Move 8 pixels more to the left
                   child: IconButton(
-                    icon: Icon(Icons.close ,size: 25,color: Colors.red[500]),
+                    icon: Icon(Icons.close, size: 25, color: Colors.red[500]),
                     onPressed: () {
                       context.pop();
                     },

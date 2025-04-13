@@ -1,3 +1,4 @@
+import 'package:agronomist_partner/pages/bottomappbar.dart';
 import 'package:agronomist_partner/pages/editprofile.dart';
 
 import 'package:agronomist_partner/pages/login.dart';
@@ -5,6 +6,7 @@ import 'package:agronomist_partner/pages/login.dart';
 import 'package:agronomist_partner/pages/mainpage.dart';
 import 'package:agronomist_partner/pages/profilemenu.dart';
 import 'package:agronomist_partner/pages/profilepage.dart';
+import 'package:agronomist_partner/pages/searchpage.dart';
 
 import 'package:agronomist_partner/pages/splash_screen/splashscreen.dart';
 import 'package:agronomist_partner/pages/welcomescreen.dart';
@@ -20,25 +22,20 @@ Stream<User?> get authStateChanges => _auth.authStateChanges();
 final GoRouter router = GoRouter(
   initialLocation: '/splashscreen',
   redirect: (BuildContext context, GoRouterState state) {
-    // Check auth state
     final isLoggedIn = _auth.currentUser != null;
     final isLoggingIn = state.uri.toString() == '/loginpage';
 
-    // If not logged in and not going to login page, redirect to login
     if (!isLoggedIn && !isLoggingIn) {
       return '/welcomescreen';
     }
 
-    // If logged in and trying to go to login page, redirect to home
     if (isLoggedIn && isLoggingIn) {
       return '/mainpage';
     }
 
-    // No redirect needed
     return null;
   },
   routes: [
-    // Public routes
     GoRoute(
       path: '/splashscreen',
       builder: (context, state) => SplashScreenWidget(),
@@ -47,35 +44,53 @@ final GoRouter router = GoRouter(
       path: '/loginpage',
       builder: (context, state) => LoginPage(),
     ),
+    GoRoute(
+      path: '/welcomescreen',
+      builder: (context, state) => WelcomeScreen(),
+    ),
+     GoRoute(
+          path: '/searchpage',
+          builder: (context, state) => SearchPage(),
+        ),
 
-    // Protected routes (require authentication)
+    /// 👇 ShellRoute with BottomNavigation
     ShellRoute(
       builder: (context, state, child) {
-        return AuthWrapper(child: child);
+        return AuthWrapper(child: BottomAppBarNav(child: child));
       },
       routes: [
-        GoRoute(
-          path: '/profilepage',
-          builder: (context, state) => ProfilePage(),
-        ),
         GoRoute(
           path: '/mainpage',
           builder: (context, state) => HomePage(),
         ),
         GoRoute(
-          path: '/profilemenu',
+          path: '/publish',
+          builder: (context, state) => Center(child: Text("Publish Page")),
+        ),
+        GoRoute(
+          path: '/rides',
+          builder: (context, state) => Center(child: Text("Your Rides Page")),
+        ),
+        GoRoute(
+          path: '/inbox',
+          builder: (context, state) => ProfileMenu()
+        ),
+        GoRoute(
+          path: '/profile',
           builder: (context, state) => ProfileMenu(),
-        ),
-        GoRoute(
-          path: '/editprofile',
-          builder: (context, state) => EditProfileScreen(),
-        ),
-        GoRoute(
-          path: '/welcomescreen',
-          builder: (context, state) => WelcomeScreen(),
         ),
        
       ],
+    ),
+
+    // Optional: outside bottom nav, but protected
+    GoRoute(
+      path: '/profilemenu',
+      builder: (context, state) => ProfileMenu(),
+    ),
+    GoRoute(
+      path: '/editprofile',
+      builder: (context, state) => EditProfileScreen(),
     ),
   ],
 );

@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'package:agronomist_partner/pages/bottomappbar.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,6 +15,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String temperature = 'Loading...';
   String weatherCondition = '';
+  String fromLocation = "Bangalore";
+  String toLocation = "Salem";
+  bool isToday = true;
+  DateTime selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -19,10 +26,14 @@ class _HomePageState extends State<HomePage> {
     _fetchWeather();
   }
 
-  void _onImageTap() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Image tapped!')),
-    );
+  void _onImageTap() {}
+
+  void swapLocations() {
+    setState(() {
+      final temp = fromLocation;
+      fromLocation = toLocation;
+      toLocation = temp;
+    });
   }
 
   Future<void> _fetchWeather() async {
@@ -60,8 +71,29 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+    // Function to change the date when tapped
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        isToday = selectedDate.isAtSameMomentAs(DateTime.now());
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+
+        // Format the selected date
+    String formattedDate = DateFormat('dd MMM').format(selectedDate);
+    String formattedDay = DateFormat('EEE').format(selectedDate);
     return Scaffold(
       body: Stack(
         children: [
@@ -99,7 +131,7 @@ class _HomePageState extends State<HomePage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black12,
                     blurRadius: 10,
@@ -108,122 +140,184 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   // FROM section
-             // FROM section
-Container(
-  height: 47,
-  padding: const EdgeInsets.symmetric(horizontal: 12),
-  decoration: BoxDecoration(
-    color: Colors.grey[300],
-    borderRadius: BorderRadius.circular(8),
-  ),
-  child: Row(
-    children: [
-      Image.asset('assets/images/google.png', width: 24),
-      const SizedBox(width: 8),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Text(
-            "FROM:",
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
-            ),
-          ),
-          SizedBox(height: 2),
-          Text(
-            "Bangalore",
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    ],
-  ),
-),
+                  GestureDetector(
+                    onTap: () {
+                      context.push('/searchpage');
+                    },
+                    child: Container(
+                      height: 47,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Image.asset('assets/images/from.png', width: 24),
+                          const SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "FROM:",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                fromLocation,
+                                style: const TextStyle(
+                                    fontSize: 13, fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
 
-                
- Image.asset('assets/images/swap.png', width: 20),
-           // TO section
-Container(
-  height: 47,
-  padding: const EdgeInsets.symmetric(horizontal: 12),
-  decoration: BoxDecoration(
-    color: Colors.grey[300],
-    borderRadius: BorderRadius.circular(8),
-  ),
-  child: Row(
-    children: [
-      Image.asset('assets/images/google.png', width: 24),
-      const SizedBox(width: 8),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "To",
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[500],
-            ),
-          ),
-          const SizedBox(height: 2),
-          const Text(
-            "Salem",
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    ],
-  ),
-),
+                  // SWAP icon
+                  GestureDetector(
+                    onTap: swapLocations,
+                    child: Image.asset('assets/images/swap.png', width: 20),
+                  ),
+
+                  // TO section
+                  Container(
+                    height: 47,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Image.asset('assets/images/to.png',
+                            width: 24, height: 40),
+                        const SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "TO:",
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              toLocation,
+                              style: const TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
 
                   const SizedBox(height: 16),
 
                   // DATE + Buttons
-                  Row(
-                    children: [
-                      Image.asset('assets/images/calender.png',
-                          width: 24), // Calendar icon
-                      const SizedBox(width: 8),
-                      const Text("DATE",
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey)),
-                      const SizedBox(width: 8),
-                      const Text("11 Apr,",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      const Text(" Fri"),
-                      const Spacer(),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.blue),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 4),
-                        child: const Text("Today",
-                            style: TextStyle(color: Colors.blue)),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        child: const Text("Tomorrow"),
-                      ),
-                    ],
-                  ),
+                Row(
+      children: [
+        // Calendar Icon with onTap functionality
+        GestureDetector(
+          onTap: () => _selectDate(context),
+          child: Image.asset(
+            'assets/images/calender.png',
+            width: 24,
+          ),
+        ),
+        const SizedBox(width: 8),
+
+        // "DATE" label
+        GestureDetector(
+          onTap: () => _selectDate(context),
+      child:  Text(
+          "DATE",
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        )),
+        const SizedBox(width: 8),
+
+        // Displaying the selected date dynamically
+        Text(
+          formattedDate + ',',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(formattedDay),
+
+        const Spacer(),
+
+        // "Today" button with dynamic decoration and color
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              isToday = true;
+              selectedDate = DateTime.now(); // Set to today's date
+            });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: isToday ? Color(0xFF1B4EA0) : Colors.transparent,
+              ),
+              color: isToday ? Colors.white : Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: Text(
+              "Today",
+              style: TextStyle(
+                color: isToday ? Color(0xFF1B4EA0) : Colors.black,
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 8),
+
+        // "Tomorrow" button with dynamic decoration and color
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              isToday = false;
+              selectedDate = DateTime.now().add(Duration(days: 1)); // Set to tomorrow's date
+            });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: !isToday ? Color(0xFF1B4EA0) : Colors.transparent,
+              ),
+              color: !isToday ? Colors.white : Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: Text(
+              "Tomorrow",
+              style: TextStyle(
+                color: !isToday ? Color(0xFF1B4EA0) : Colors.black,
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
                   const SizedBox(height: 16),
 
                   // Search Button
@@ -233,7 +327,10 @@ Container(
                       height: 48,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF3A8DFF), Color(0xFF0D61F2)],
+                          colors: [
+                            Color(0xFF1B4EA0),
+                            Color(0xFF1B4EA0),
+                          ],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
                         ),
