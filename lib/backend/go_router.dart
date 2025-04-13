@@ -6,6 +6,8 @@ import 'package:agronomist_partner/pages/login.dart';
 import 'package:agronomist_partner/pages/mainpage.dart';
 import 'package:agronomist_partner/pages/profilemenu.dart';
 import 'package:agronomist_partner/pages/profilepage.dart';
+import 'package:agronomist_partner/pages/publish/publishride.dart';
+import 'package:agronomist_partner/pages/publish/yourrides.dart';
 import 'package:agronomist_partner/pages/searchpage.dart';
 
 import 'package:agronomist_partner/pages/splash_screen/splashscreen.dart';
@@ -65,11 +67,11 @@ final GoRouter router = GoRouter(
         ),
         GoRoute(
           path: '/publish',
-          builder: (context, state) => Center(child: Text("Publish Page")),
+          builder: (context, state) => PublishRidePage(),
         ),
         GoRoute(
           path: '/rides',
-          builder: (context, state) => Center(child: Text("Your Rides Page")),
+          builder: (context, state) => YourRidespage(),
         ),
         GoRoute(
           path: '/inbox',

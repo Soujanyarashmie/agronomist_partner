@@ -73,7 +73,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> fetchUserProfile() async {
   final token = await userData.getFirebaseToken();
-  final uid = await userData.getFirebaseUid(); // Make sure this method exists
+  final uid = await userData.getFirebaseUid(); 
   print("🔐 Token: $token");
   print("👤 UID: $uid");
 
