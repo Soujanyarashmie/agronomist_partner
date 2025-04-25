@@ -23,7 +23,8 @@ class _BottomAppBarNavState extends State<BottomAppBarNav> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final location = GoRouter.of(context).routeInformationProvider.value.location;
+    final location =
+        GoRouter.of(context).routeInformationProvider.value.location;
     final index = _routes.indexWhere((route) => location.startsWith(route));
     if (index != -1 && index != _selectedIndex) {
       _selectedIndex = index;
@@ -39,37 +40,43 @@ class _BottomAppBarNavState extends State<BottomAppBarNav> {
     return Scaffold(
       backgroundColor: Colors.white, // Scaffold background color
       body: widget.child,
-     bottomNavigationBar: Column(
+   bottomNavigationBar: Column(
   mainAxisSize: MainAxisSize.min,
   children: [
-    // Move line down using Padding or increase margin
-    Padding(
-      padding: const EdgeInsets.only(top: 8.0), // Moves it down from top
-      child: Container(
-        height: 1,
-        color: Colors.grey.shade300,
-      ),
+    // Thin line on top
+    Container(
+      height: 1,
+      color: Colors.grey.shade300,
     ),
+    // Bottom nav bar with reduced height
     Theme(
       data: ThemeData(
         canvasColor: Colors.white,
       ),
-      child: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFF1B4EA0),
-        unselectedItemColor: Colors.grey,
-        selectedFontSize: 14,
-        unselectedFontSize: 14,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'Publish'),
-          BottomNavigationBarItem(icon: Icon(Icons.format_quote), label: 'Your rides'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: 'Inbox'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-        ],
+      child: SizedBox(
+        height: 50, // Custom height (default is 56)
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Color(0xFF1B4EA0),
+          unselectedItemColor: Colors.grey,
+          selectedFontSize: 12, // Slightly smaller font
+          unselectedFontSize: 12,
+          showUnselectedLabels: true,
+          items: const [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.search, size: 20), label: 'Search'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.add_circle_outline, size: 20), label: 'Publish'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.format_quote, size: 20), label: 'Your rides'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.chat_bubble_outline, size: 20), label: 'Inbox'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline, size: 20), label: 'Profile'),
+          ],
+        ),
       ),
     ),
   ],

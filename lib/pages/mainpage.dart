@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:agronomist_partner/pages/RideResultPage.dart';
 import 'package:agronomist_partner/pages/bottomappbar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +36,33 @@ class _HomePageState extends State<HomePage> {
       toLocation = temp;
     });
   }
+
+  void _handleSearch() async {
+  // Just hardcoded coordinates for now
+  final fromLat = 12.9716;
+  final fromLng = 77.5946;
+  final toLat = 13.0827;
+  final toLng = 80.2707;
+
+  final response = await Uri.parse(
+    'https://cloths-api-backend.onrender.com/api/v1/rides/search?fromLat=$fromLat&fromLng=$fromLng&toLat=$toLat&toLng=$toLng',
+  );
+
+  final res = await http.get(response);
+
+  if (res.statusCode == 200) {
+    final data = json.decode(res.body);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RideResultPage(rides: data['rides']),
+      ),
+    );
+  } else {
+    print("Failed to load rides");
+  }
+}
+
 
   Future<void> _fetchWeather() async {
     try {
@@ -321,30 +349,34 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 16),
 
                   // Search Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: Container(
-                      height: 48,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF1B4EA0),
-                            Color(0xFF1B4EA0),
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          "SEARCH BIKES",
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
+                SizedBox(
+  width: double.infinity,
+  child: GestureDetector(
+    onTap: _handleSearch,  // Your search function here
+    child: Container(
+      height: 48,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF1B4EA0),
+            Color(0xFF1B4EA0),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Center(
+        child: Text(
+          "SEARCH BIKES",
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    ),
+  ),
+)
+
                 ],
               ),
             ),
