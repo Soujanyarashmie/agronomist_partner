@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'location_data_model.dart'; // import the model
 
 class SearchPage extends StatefulWidget {
+  const SearchPage({super.key, required Map<String, Object> locationData});
+
   @override
   State<SearchPage> createState() => _SearchPageState();
 }
@@ -8,6 +12,9 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController fromController = TextEditingController();
   final TextEditingController toController = TextEditingController();
+
+  LocationDataModel? fromLocation;
+  LocationDataModel? toLocation;
 
   final List<String> recentSearches = [
     "Bangalore - Salem",
@@ -45,9 +52,25 @@ class _SearchPageState extends State<SearchPage> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            _buildInputField(Icons.arrow_back_ios_new, "From", fromController),
+            _buildInputField(Icons.arrow_back_ios_new, "From", fromController, () async {
+              final result = await context.push<LocationDataModel>('/mapPicker');
+              if (result != null) {
+                setState(() {
+                  fromLocation = result;
+                  fromController.text = result.placeName;
+                });
+              }
+            }),
             const SizedBox(height: 10),
-            _buildInputField(Icons.more_horiz, "To", toController),
+            _buildInputField(Icons.more_horiz, "To", toController, () async {
+              final result = await context.push<LocationDataModel>('/mapPicker');
+              if (result != null) {
+                setState(() {
+                  toLocation = result;
+                  toController.text = result.placeName;
+                });
+              }
+            }),
             const SizedBox(height: 20),
             _buildSectionTitle("Recently searched"),
             const SizedBox(height: 10),
@@ -81,30 +104,40 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildInputField(IconData icon, String hint, TextEditingController controller) {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.grey),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              style: const TextStyle(fontSize: 16),
-              decoration: InputDecoration(
-                hintText: hint,
-                border: InputBorder.none,
-                hintStyle: const TextStyle(color: Colors.grey),
-              ),
-            ),
+  Widget _buildInputField(
+    IconData icon,
+    String hint,
+    TextEditingController controller,
+    void Function() onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AbsorbPointer(
+        child: Container(
+          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
           ),
-        ],
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: [
+              Icon(icon, color: Colors.grey),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  style: const TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    border: InputBorder.none,
+                    hintStyle: const TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

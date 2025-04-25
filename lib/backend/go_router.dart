@@ -1,3 +1,4 @@
+import 'package:agronomist_partner/gmaps.dart';
 import 'package:agronomist_partner/pages/bottomappbar.dart';
 import 'package:agronomist_partner/pages/editprofile.dart';
 
@@ -50,10 +51,20 @@ final GoRouter router = GoRouter(
       path: '/welcomescreen',
       builder: (context, state) => WelcomeScreen(),
     ),
-     GoRoute(
-          path: '/searchpage',
-          builder: (context, state) => SearchPage(),
-        ),
+GoRoute(
+  path: '/searchpage',
+  builder: (context, state) {
+    // Extract the location data from the extra parameters as Map<String, Object>
+    final locationData = state.extra as Map<String, Object>? ?? {};
+    return SearchPage(locationData: locationData);
+  },
+),
+
+
+        GoRoute(
+      path: '/mapPicker',
+      builder: (context, state) => GoogleMapLocationPicker(),
+    ),
 
     /// 👇 ShellRoute with BottomNavigation
     ShellRoute(
