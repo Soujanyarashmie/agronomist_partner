@@ -1,4 +1,6 @@
 import 'package:agronomist_partner/pages/login.dart';
+
+import 'package:agronomist_partner/provider/location_provider.dart';
 import 'package:agronomist_partner/provider/map_seletion.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -24,8 +26,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => MapSelectionProvider()),
         // Add more providers here as needed
-        // ChangeNotifierProvider(create: (_) => SomeOtherProvider()),
+        ChangeNotifierProvider(create: (_) => LocationProvider()),
+       
       ],
+
       child: MaterialApp.router(
         routerConfig: router,
         title: 'Agronomist Partner',

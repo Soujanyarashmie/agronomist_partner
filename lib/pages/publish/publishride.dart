@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:agronomist_partner/pages/login.dart';
+import 'package:agronomist_partner/provider/location_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class PublishRidePage extends StatefulWidget {
   const PublishRidePage({Key? key}) : super(key: key);
@@ -11,7 +14,7 @@ class PublishRidePage extends StatefulWidget {
 }
 
 class _PublishRidePageState extends State<PublishRidePage> {
-    final UserData userData = UserData();
+  final UserData userData = UserData();
   final TextEditingController fromController = TextEditingController();
   final TextEditingController toController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
@@ -26,25 +29,36 @@ class _PublishRidePageState extends State<PublishRidePage> {
   int currentIndex = 0;
 
   Future<void> publishRide() async {
+    final locationProvider =
+        Provider.of<LocationProvider>(context, listen: false);
+
+    double fromLat = locationProvider.publishFromLat;
+    double fromLng = locationProvider.publishFromLng;
+    double toLat = locationProvider.publishToLat;
+    double toLng = locationProvider.publishToLng;
+    String publishFromLocation = locationProvider.publishFromLocation;
+    String publishToLocation = locationProvider.publishToLocation;
     final uid = await userData.getFirebaseUid();
-    const url = 'https://cloths-api-backend.onrender.com/api/v1/rides/publish'; // Replace with actual IP and port
+    const url =
+        'https://cloths-api-backend.onrender.com/api/v1/rides/publish'; // Replace with actual IP and port
 
     final body = {
-      "uid": uid, // hardcoded user ID
+      "uid": uid,
       "from": {
-        "city": fromController.text,
+        "city": publishFromLocation,
         "location": "Hardcoded From Street",
-        "lat": 12.9716,
-        "lng": 77.5946
+        "lat": fromLat,
+        "lng": fromLng
       },
       "to": {
-        "city": toController.text,
+        "city": publishToLocation,
         "location": "Hardcoded To Place",
-        "lat": 13.0827,
-        "lng": 80.2707
+        "lat": toLat,
+        "lng": toLng
       },
       "date": dateController.text,
-      "time": timeController.text,
+      "startTime": timeController.text,
+      "endTime": "7.30pm",
       "seatsAvailable": 3,
       "pricePerSeat": double.tryParse(priceController.text) ?? 0,
       "vehicleDetails": {
@@ -76,6 +90,95 @@ class _PublishRidePageState extends State<PublishRidePage> {
     }
   }
 
+  Future<void> getApproxPrice() async {
+    final locationProvider =
+        Provider.of<LocationProvider>(context, listen: false);
+
+    double fromLat = locationProvider.publishFromLat;
+    double fromLng = locationProvider.publishFromLng;
+    double toLat = locationProvider.publishToLat;
+    double toLng = locationProvider.publishToLng;
+
+    final url =
+        'https://cloths-api-backend.onrender.com/api/v1/calculate-price'; // Replace with your actual endpoint
+
+    final body = {
+      'fromLat': fromLat,
+      'fromLon': fromLng,
+      'toLat': toLat,
+      'toLon': toLng,
+    };
+
+    print(
+        'Request body: $body'); // Debug: Print the body to check the data sent
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      print(
+          'Response status: ${response.statusCode}'); // Debug: Print the status code
+      print(
+          'Response body: ${response.body}'); // Debug: Print the body of the response
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        print('API Response: $data'); // Debug: Print the parsed response data
+
+        if (data['price'] != null) {
+          print(
+              'Price from API: ${data['price']}'); // Debug: Print the price value
+          setState(() {
+            priceController.text = data['price'].toString();
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Price calculated successfully!')),
+          );
+        } else {
+          print('Price not found in response'); // Debug: If no price is found
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Price not found in response')),
+          );
+        }
+      } else {
+        print(
+            'Failed API call: ${response.statusCode}'); // Debug: If status code is not 200/201
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Failed to calculate price: ${response.body}')),
+        );
+      }
+    } catch (e) {
+      print('Error: $e'); // Debug: Print any error that occurs
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final locationProvider =
+        Provider.of<LocationProvider>(context, listen: false);
+    locationProvider.addListener(() {
+      print(
+          'Location provider updated'); // Print when the location provider is updated
+      print('From location: ${locationProvider.publishFromLocation}');
+      print('To location: ${locationProvider.publishToLocation}');
+
+      if (locationProvider.publishFromLocation != "Select Location" &&
+          locationProvider.publishToLocation != "Select Location") {
+        print('Both locations are selected, calling getApproxPrice...');
+        getApproxPrice(); // Call the API when locations are set
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,29 +192,134 @@ class _PublishRidePageState extends State<PublishRidePage> {
                 'Where to?',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-               const SizedBox(height: 20),
-            Image.asset(
-              'assets/images/noride.png', // your image path
-              width: 180,
-              height: 80,
-              fit: BoxFit.contain,
-            ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: fromController,
-                decoration: const InputDecoration(
-                  labelText: 'From',
-                  hintText: 'City, town, address, or place',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: toController,
-                decoration: const InputDecoration(
-                  labelText: 'To',
-                  hintText: 'City, town, address, or place',
-                  border: OutlineInputBorder(),
+              Positioned(
+                top: MediaQuery.of(context).size.height * 0.42,
+                left: 20,
+                right: 20,
+                child: Container(
+                  height: 153,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          final result = await context.push('/mapPicker',
+                              extra: {'isFrompublishLocation': true});
+                          if (result != null &&
+                              result is Map<String, dynamic>) {
+                            Provider.of<LocationProvider>(context,
+                                    listen: false)
+                                .updatePublishFromLocation(
+                              result['locality'] ?? "Select Location",
+                              result['latitude'] ?? 0.0,
+                              result['longitude'] ?? 0.0,
+                            );
+                          }
+                        },
+                        child: Consumer<LocationProvider>(
+                            builder: (context, locationProvider, child) {
+                          return Container(
+                            height: 47,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Image.asset('assets/images/from.png',
+                                    width: 24),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text("FROM:",
+                                        style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey)),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      locationProvider.publishFromLocation,
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ),
+                      SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () async {
+                          final result = await context.push('/mapPicker',
+                              extra: {'isToPublishLocation': true});
+                          if (result != null &&
+                              result is Map<String, dynamic>) {
+                            Provider.of<LocationProvider>(context,
+                                    listen: false)
+                                .updatePublishToLocation(
+                              result['locality'] ?? "Select Location",
+                              result['latitude'] ?? 0.0,
+                              result['longitude'] ?? 0.0,
+                            );
+                          }
+                        },
+                        child: Consumer<LocationProvider>(
+                            builder: (context, locationProvider, child) {
+                          return Container(
+                            height: 47,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Image.asset('assets/images/to.png', width: 24),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text("TO:",
+                                        style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey)),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      locationProvider.publishToLocation,
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -139,44 +347,31 @@ class _PublishRidePageState extends State<PublishRidePage> {
                 decoration: const InputDecoration(
                   labelText: 'Price',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.price_check),
+                  prefixIcon: Icon(Icons.monetization_on),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: typeController,
                 decoration: const InputDecoration(
-                  labelText: 'Vechile Type',
+                  labelText: 'Vehicle type',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.electric_bike),
+                  prefixIcon: Icon(Icons.directions_car),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: numberController,
                 decoration: const InputDecoration(
-                  labelText: 'Vehicle Number',
+                  labelText: 'Vehicle number',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.numbers),
+                  prefixIcon: Icon(Icons.local_car_wash),
                 ),
               ),
               const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: publishRide,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF1B4EA0),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: const Text(
-                    'Publish',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
+              ElevatedButton(
+                onPressed: publishRide,
+                child: const Text('Publish Ride'),
               ),
             ],
           ),

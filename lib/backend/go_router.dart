@@ -51,20 +51,25 @@ final GoRouter router = GoRouter(
       path: '/welcomescreen',
       builder: (context, state) => WelcomeScreen(),
     ),
+
 GoRoute(
-  path: '/searchpage',
+  path: '/mapPicker',
   builder: (context, state) {
-    // Extract the location data from the extra parameters as Map<String, Object>
-    final locationData = state.extra as Map<String, Object>? ?? {};
-    return SearchPage(locationData: locationData);
+    final map = state.extra as Map<String, dynamic>;
+
+    // Set default values in case the keys are missing or null
+    final bool isFromLocation = map['isFromLocation'] ?? false;
+    final bool isToPublishLocation = map['isToPublishLocation'] ?? false;
+    final bool isFrompublishLocation = map['isFrompublishLocation'] ?? false;
+
+    return GoogleMapLocationPicker(
+      isFromLocation: isFromLocation,
+      isToPublishLocation: isToPublishLocation,
+      isFrompublishLocation: isFrompublishLocation,
+    );
   },
-),
-
-
-        GoRoute(
-      path: '/mapPicker',
-      builder: (context, state) => GoogleMapLocationPicker(),
-    ),
+)
+,
 
     /// 👇 ShellRoute with BottomNavigation
     ShellRoute(
@@ -84,15 +89,11 @@ GoRoute(
           path: '/rides',
           builder: (context, state) => YourRidespage(),
         ),
-        GoRoute(
-          path: '/inbox',
-          builder: (context, state) => ProfileMenu()
-        ),
+        GoRoute(path: '/inbox', builder: (context, state) => ProfileMenu()),
         GoRoute(
           path: '/profile',
           builder: (context, state) => ProfileMenu(),
         ),
-       
       ],
     ),
 

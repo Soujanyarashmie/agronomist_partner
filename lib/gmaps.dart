@@ -1,4 +1,5 @@
 import 'package:agronomist_partner/pages/searchpage.dart';
+import 'package:agronomist_partner/provider/location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:location/location.dart';
+import 'package:provider/provider.dart';
 
 class AddressManager {
   // Private Constructor
@@ -67,14 +69,19 @@ class AddressManager {
 
 class GoogleMapLocationPicker extends StatefulWidget {
   final ValueChanged<String>? onAddressChanged;
-
+  final bool isFromLocation; // Add this line
+  final bool isToPublishLocation;
+  final bool isFrompublishLocation;
   const GoogleMapLocationPicker(
       {super.key,
       this.width,
       this.height,
       this.initialCamera,
       this.initialZoom,
-      this.onAddressChanged});
+      this.onAddressChanged,
+      required this.isFromLocation,
+      required this.isToPublishLocation,
+      required this.isFrompublishLocation});
 
   final double? width;
   final double? height;
@@ -94,6 +101,7 @@ class _GoogleMapLocationPickerState extends State<GoogleMapLocationPicker> {
   final TextEditingController _searchController = TextEditingController();
   final _secureStorage = const FlutterSecureStorage();
   LatLng? _initialCameraPosition;
+  String? locality;
 
   @override
   void initState() {
@@ -137,6 +145,7 @@ class _GoogleMapLocationPickerState extends State<GoogleMapLocationPicker> {
         Placemark place = placemarks.first;
         String fullAddress =
             "${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}, ${place.country}";
+
         // Update AddressManager with fetched data
         AddressManager.instance.updateAddress(
           fullAddress: fullAddress,
@@ -147,10 +156,11 @@ class _GoogleMapLocationPickerState extends State<GoogleMapLocationPicker> {
           country: place.country ?? "Unknown Country",
         );
 
-        print('location:$fullAddress');
+        // Store the administrativeArea to use later
+        locality = place.locality ?? "Unknown State";
+
         setState(() {
           _address = fullAddress;
-
           _currentAdress = place.name ?? "Unknown location";
         });
       }
@@ -382,23 +392,57 @@ class _GoogleMapLocationPickerState extends State<GoogleMapLocationPicker> {
                         'latitude': _lastMapPosition!.latitude,
                         'longitude': _lastMapPosition!.longitude,
                         'address': _address,
-                        'locality': AddressManager.instance.getLocality(),
-                        'administrativeArea':
-                            AddressManager.instance.getAdministrativeArea(),
-                        'postalCode': AddressManager.instance.getPostalCode(),
-                        'subLocality': AddressManager.instance.getSubLocality(),
-                        'country': AddressManager.instance.getCountry(),
+                        'locality': locality ??
+                            "Unknown State", // Using class-level locality
                       };
 
-                      print("data123:$locationData");
+                      // Extract values with proper type casting and distinct names
+                      final String selectedLocality =
+                          locationData['locality'] as String;
+                      final double selectedLatitude =
+                          locationData['latitude'] as double;
+                      final double selectedLongitude =
+                          locationData['longitude'] as double;
 
-                      // Cast to Map<String, Object>
-                      context.push('/searchpage',
-                          extra: locationData.cast<String, Object>());
+                      // Determine which field to update based on the flags
+                      if (widget.isFromLocation) {
+                        Provider.of<LocationProvider>(context, listen: false)
+                            .updateMainFromLocation(
+                          selectedLocality,
+                          selectedLatitude,
+                          selectedLongitude,
+                        );
+                      } else if (widget.isToPublishLocation) {
+                        Provider.of<LocationProvider>(context, listen: false)
+                            .updatePublishToLocation(
+                          selectedLocality,
+                          selectedLatitude,
+                          selectedLongitude,
+                        );
+                      } else if (widget.isFrompublishLocation) {
+                        Provider.of<LocationProvider>(context, listen: false)
+                            .updatePublishFromLocation(
+                          selectedLocality,
+                          selectedLatitude,
+                          selectedLongitude,
+                        );
+                      } else {
+                        Provider.of<LocationProvider>(context, listen: false)
+                            .updateMainToLocation(
+                          selectedLocality,
+                          selectedLatitude,
+                          selectedLongitude,
+                        );
+                      }
+
+                      Navigator.pop(context, locationData);
                     }
                   },
-                  child: const Text("Select Location"),
-                ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                  ),
+                  child: const Text('Select Location'),
+                )
               ],
             ),
           ),
