@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -83,11 +84,10 @@ class UserData {
     return await user?.getIdToken() ?? '';
   }
 
-   Future<String> getFirebaseUid() async {
-  final user = FirebaseAuth.instance.currentUser;
-  return user?.uid ?? '';
-}
-
+  Future<String> getFirebaseUid() async {
+    final user = FirebaseAuth.instance.currentUser;
+    return user?.uid ?? '';
+  }
 
   Future<void> logout() async {
     await FirebaseAuth.instance.signOut();
@@ -113,6 +113,29 @@ class _LoginPageState extends State<LoginPage> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isSigningIn = false;
+
+  Future<void> sendFCMTokenToBackend(String token) async {
+    final idToken = await FirebaseAuth.instance.currentUser?.getIdToken();
+
+    if (idToken != null) {
+      final response = await http.post(
+        Uri.parse(
+            'https://cloths-api-backend.onrender.com/api/v1/user/update-fcm'),
+        headers: {
+          'Authorization': 'Bearer $idToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'fcmToken': token}),
+      );
+
+      if (response.statusCode == 200) {
+        print("✅ FCM token sent to backend successfully.");
+      } else {
+        print("❌ Failed to send FCM token: ${response.statusCode}");
+        print("❌ Response: ${response.body}");
+      }
+    }
+  }
 
   Future<void> signInWithGoogle() async {
     setState(() => _isSigningIn = true);
@@ -182,6 +205,11 @@ class _LoginPageState extends State<LoginPage> {
           // 👉 Navigate after backend tasks
           if (mounted) {
             context.go('/mainpage');
+          }
+          // 🔁 Send FCM token after login
+          final fcmToken = await FirebaseMessaging.instance.getToken();
+          if (fcmToken != null) {
+            await sendFCMTokenToBackend(fcmToken);
           }
         }
       }

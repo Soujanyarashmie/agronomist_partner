@@ -1,12 +1,20 @@
 // Top-level build.gradle file
 
+buildscript {
+    ext.kotlin_version = '2.1.0' // ✅ Explicit Kotlin version
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
 plugins {
-    // Do NOT declare versions for Flutter-managed plugins
     id 'com.android.application' apply false
     id 'com.android.library' apply false
     id 'org.jetbrains.kotlin.android' apply false
-
-    // Firebase plugin (you can keep the version here safely)
     id 'com.google.gms.google-services' version '4.4.2' apply false
 }
 
@@ -20,8 +28,6 @@ allprojects {
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
     project.evaluationDependsOn(":app")
 }
 

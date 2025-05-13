@@ -1,4 +1,5 @@
 import 'package:agronomist_partner/gmaps.dart';
+import 'package:agronomist_partner/pages/bookingscreen.dart';
 import 'package:agronomist_partner/pages/bottomappbar.dart';
 import 'package:agronomist_partner/pages/editprofile.dart';
 
@@ -52,24 +53,24 @@ final GoRouter router = GoRouter(
       builder: (context, state) => WelcomeScreen(),
     ),
 
-GoRoute(
-  path: '/mapPicker',
-  builder: (context, state) {
-    final map = state.extra as Map<String, dynamic>;
+    GoRoute(
+      path: '/mapPicker',
+      builder: (context, state) {
+        final map = state.extra as Map<String, dynamic>;
 
-    // Set default values in case the keys are missing or null
-    final bool isFromLocation = map['isFromLocation'] ?? false;
-    final bool isToPublishLocation = map['isToPublishLocation'] ?? false;
-    final bool isFrompublishLocation = map['isFrompublishLocation'] ?? false;
+        // Set default values in case the keys are missing or null
+        final bool isFromLocation = map['isFromLocation'] ?? false;
+        final bool isToPublishLocation = map['isToPublishLocation'] ?? false;
+        final bool isFrompublishLocation =
+            map['isFrompublishLocation'] ?? false;
 
-    return GoogleMapLocationPicker(
-      isFromLocation: isFromLocation,
-      isToPublishLocation: isToPublishLocation,
-      isFrompublishLocation: isFrompublishLocation,
-    );
-  },
-)
-,
+        return GoogleMapLocationPicker(
+          isFromLocation: isFromLocation,
+          isToPublishLocation: isToPublishLocation,
+          isFrompublishLocation: isFrompublishLocation,
+        );
+      },
+    ),
 
     /// 👇 ShellRoute with BottomNavigation
     ShellRoute(
@@ -105,6 +106,13 @@ GoRoute(
     GoRoute(
       path: '/editprofile',
       builder: (context, state) => EditProfileScreen(),
+    ),
+    GoRoute(
+      path: '/booking',
+      builder: (context, state) {
+        final ride = state.extra as Map<String, dynamic>; // assuming it's a Map
+        return BookingScreen(ride: ride);
+      },
     ),
   ],
 );

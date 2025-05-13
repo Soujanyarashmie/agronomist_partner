@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
       final data = json.decode(res.body);
       final List rides = data['rides'];
 
-      print("Rides found: ${rides.length}");
+      print("Rides found: ${rides}");
 
       if (rides.isEmpty) {
         print("No rides found for this route. Showing snack bar.");
