@@ -4,6 +4,7 @@ import 'package:agronomist_partner/provider/location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class PublishRidePage extends StatefulWidget {
@@ -22,6 +23,8 @@ class _PublishRidePageState extends State<PublishRidePage> {
   final TextEditingController priceController = TextEditingController();
   final TextEditingController typeController = TextEditingController();
   final TextEditingController numberController = TextEditingController();
+  final TextEditingController endtimeController = TextEditingController();
+  String formattedBackendDate = '';
 
   bool onlyFromRegulars = false;
   bool notifyMatchingRides = false;
@@ -56,10 +59,10 @@ class _PublishRidePageState extends State<PublishRidePage> {
         "lat": toLat,
         "lng": toLng
       },
-      "date": dateController.text,
+      "date": formattedBackendDate,
       "startTime": timeController.text,
-      "endTime": "7.30pm",
-      "seatsAvailable": 3,
+      "endTime": endtimeController,
+      "seatsAvailable": 1,
       "pricePerSeat": double.tryParse(priceController.text) ?? 0,
       "vehicleDetails": {
         "type": typeController.text,
@@ -323,18 +326,50 @@ class _PublishRidePageState extends State<PublishRidePage> {
                 ),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: dateController,
-                decoration: const InputDecoration(
-                  labelText: 'Departure date (optional)',
-                  hintText: 'MM/DD',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.calendar_today),
+              GestureDetector(
+                onTap: () async {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2023),
+                    lastDate: DateTime(2100),
+                  );
+
+                  if (picked != null) {
+                    // Display format: dd-MM-yyyy
+                    String displayDate =
+                        DateFormat('dd-MM-yyyy').format(picked);
+                    dateController.text = displayDate;
+
+                    // Store backend format separately if needed
+                    formattedBackendDate =
+                        DateFormat('yyyy-MM-dd').format(picked);
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller: dateController,
+                    decoration: const InputDecoration(
+                      labelText: 'Departure date',
+                      hintText: 'dd-MM-yyyy',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.calendar_today),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: timeController,
+                decoration: const InputDecoration(
+                  labelText: 'Time ',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.access_time),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: endtimeController,
                 decoration: const InputDecoration(
                   labelText: 'Time ',
                   border: OutlineInputBorder(),

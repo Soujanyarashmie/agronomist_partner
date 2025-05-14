@@ -88,7 +88,7 @@ final GoRouter router = GoRouter(
         ),
         GoRoute(
           path: '/rides',
-          builder: (context, state) => YourRidespage(),
+          builder: (context, state) => DriverRidesTabsPage(),
         ),
         GoRoute(path: '/inbox', builder: (context, state) => ProfileMenu()),
         GoRoute(
