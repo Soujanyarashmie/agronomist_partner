@@ -93,7 +93,7 @@ class UserData {
     await FirebaseAuth.instance.signOut();
     await GoogleSignIn().signOut();
     final prefs = await SharedPreferences.getInstance();
-   // await prefs.clear();
+    // await prefs.clear();
     email = '';
     imageUrl = '';
     name = '';

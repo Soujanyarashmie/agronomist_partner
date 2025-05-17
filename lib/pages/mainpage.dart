@@ -370,7 +370,7 @@ class _HomePageState extends State<HomePage> {
                               color: Colors.grey,
                             ),
                           )),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 4),
 
                       // Displaying the selected date dynamically
                       Text(
@@ -412,7 +412,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
 
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 4),
 
                       // "Tomorrow" button with dynamic decoration and color
                       GestureDetector(

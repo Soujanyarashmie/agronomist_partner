@@ -7,24 +7,37 @@ class RideResultPage extends StatelessWidget {
   const RideResultPage({super.key, required this.rides});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        title: const Text('Ride Results'),
-        centerTitle: true,
-        backgroundColor: Color(0xFF1B4EA0),
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(12),
-        child: ListView.builder(
-          itemCount: rides.length,
-          itemBuilder: (context, index) {
-            final ride = rides[index];
+Widget build(BuildContext context) {
+  // Sort rides: available (seatsAvailable > 0) first, then full
+  final sortedRides = [...rides]; // Copy original list to avoid modifying it
+  sortedRides.sort((a, b) {
+    final seatsA = a['seatsAvailable'] ?? 0;
+    final seatsB = b['seatsAvailable'] ?? 0;
+    return (seatsB > 0 ? 1 : 0) - (seatsA > 0 ? 1 : 0);
+  });
+
+  return Scaffold(
+    backgroundColor: const Color(0xFFF5F5F5),
+    appBar: AppBar(
+      title: const Text('Ride Results'),
+      centerTitle: true,
+      backgroundColor: const Color(0xFF1B4EA0),
+    ),
+    body: Container(
+      padding: const EdgeInsets.all(12),
+      child: ListView.builder(
+        itemCount: sortedRides.length,
+        itemBuilder: (context, index) {
+          final ride = sortedRides[index];
+            final int seatsAvailable = ride['seatsAvailable'] ?? 0;
+            final bool isAvailable = seatsAvailable > 0;
+
+            final TextStyle dimmedStyle = TextStyle(color: Colors.grey[500]);
+
             return GestureDetector(
-              onTap: () {
-                context.push('/booking', extra: ride);
-              },
+              onTap: isAvailable
+                  ? () => context.push('/booking', extra: ride)
+                  : null,
               child: Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(16),
@@ -49,41 +62,53 @@ class RideResultPage extends StatelessWidget {
                         children: [
                           Text(
                             "${ride['from']['city']} → ${ride['to']['city']}",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              color:
+                                  isAvailable ? Colors.black : Colors.grey[500],
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Bharat Benz A/C Sleeper (2+1)',
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: isAvailable
+                                  ? Colors.grey[600]
+                                  : Colors.grey[400],
                             ),
                           ),
                           const SizedBox(height: 12),
                           Row(
                             children: [
                               Text(
-                                '${ride['time']}',
-                                style: const TextStyle(
+                                '${ride['startTime']}',
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
+                                  color: isAvailable
+                                      ? Colors.black
+                                      : Colors.grey[500],
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Text(
+                              Text(
                                 '–  4h 0m  –',
                                 style: TextStyle(
-                                  color: Colors.grey,
+                                  color: isAvailable
+                                      ? Colors.grey
+                                      : Colors.grey[400],
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Text(
-                                '23:35',
+                              Text(
+                                '${ride['endTime']}',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
+                                  color: isAvailable
+                                      ? Colors.black
+                                      : Colors.grey[500],
                                 ),
                               ),
                             ],
@@ -92,9 +117,82 @@ class RideResultPage extends StatelessWidget {
                           Text(
                             "Date: ${ride['date'].substring(0, 10)} ",
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: isAvailable
+                                  ? Colors.grey[600]
+                                  : Colors.grey[400],
                             ),
                           ),
+                          const SizedBox(height: 12),
+
+// Driver Profile Row (based on screenshot)
+                          Row(
+                            children: [
+                              const Icon(Icons.bike_scooter,
+                                  color: Colors.grey),
+                              const SizedBox(width: 10),
+                              Stack(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor: Colors.grey[300],
+                                    backgroundImage: ride['user'] != null &&
+                                            ride['user']['photoURL'] != null
+                                        ? NetworkImage(ride['user']['photoURL'])
+                                        : null,
+                                    child: ride['user'] == null ||
+                                            ride['user']['photoURL'] == null
+                                        ? Icon(Icons.person,
+                                            color: Colors.white)
+                                        : null,
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.blue,
+                                      ),
+                                      padding: const EdgeInsets.all(2),
+                                      child: const Icon(Icons.check,
+                                          size: 12, color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    ride['user']?['name'] ?? 'Unknown',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.star,
+                                          size: 16, color: Colors.grey),
+                                      const SizedBox(width: 4),
+                                      // Text(
+                                      //   '${ride['driver']['rating'] ?? 4}',
+                                      //   style: const TextStyle(
+                                      //     fontSize: 14,
+                                      //     color: Colors.grey,
+                                      //   ),
+                                      // ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              const Icon(Icons.people_outline,
+                                  color: Colors.grey),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
                         ],
                       ),
                     ),
@@ -107,90 +205,43 @@ class RideResultPage extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.blue[50],
+                            color:
+                                isAvailable ? Colors.blue[50] : Colors.red[100],
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text(
-                            'Earliest',
+                          child: Text(
+                            isAvailable ? 'Available' : 'Full',
                             style: TextStyle(
-                              color: Colors.blue,
+                              color: isAvailable ? Colors.green : Colors.red,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.green[600],
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.star,
-                                      color: Colors.white, size: 14),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    '4.5',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
                         const SizedBox(height: 12),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              '₹ 1,150',
-                              style: const TextStyle(
-                                decoration: TextDecoration.lineThrough,
-                                color: Colors.grey,
-                                fontSize: 14,
-                              ),
-                            ),
                             const SizedBox(width: 6),
                             Text(
-                              '₹${ride['pricePerSeat']}/seat',
-                              style: const TextStyle(
+                              '₹${ride['pricePerSeat']}',
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
-                                color: Colors.black,
+                                color: isAvailable
+                                    ? Colors.black
+                                    : Colors.grey[500],
                               ),
                             )
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(6),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF2196F3), Color(0xFF0D47A1)],
-                            ),
-                          ),
-                          child: const Text(
-                            'MyDeal - ₹150 Off',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           'Details ▼',
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: isAvailable ? Colors.blue : Colors.grey,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),

@@ -1,5 +1,7 @@
+import 'package:agronomist_partner/backend/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -148,13 +150,13 @@ class _BookingScreenState extends State<BookingScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("${widget.ride['time']}",
+                    Text("${widget.ride['startTime']}",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     SizedBox(height: 8),
                     Text("3h30", style: TextStyle(color: Colors.grey)),
                     SizedBox(height: 8),
-                    Text("22:00",
+                   Text("${widget.ride['endTime']}",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
@@ -224,16 +226,19 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
             title: Text(
               widget.ride['user']?['name'] ?? 'Unknown',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: Row(
-              children: [
+              children: const [
                 Icon(Icons.verified, color: Colors.blue, size: 16),
                 SizedBox(width: 4),
                 Text("Verified Profile"),
               ],
             ),
-            trailing: Icon(Icons.arrow_forward_ios, size: 16),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              context.push('/ownerprofile', extra: widget.ride);
+            },
           ),
           Divider(),
           Padding(

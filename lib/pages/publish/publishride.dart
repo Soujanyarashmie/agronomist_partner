@@ -34,132 +34,95 @@ class _PublishRidePageState extends State<PublishRidePage> {
   Future<void> publishRide() async {
     final locationProvider =
         Provider.of<LocationProvider>(context, listen: false);
+    final token = await userData.getFirebaseToken(); // Get auth token
 
-    double fromLat = locationProvider.publishFromLat;
-    double fromLng = locationProvider.publishFromLng;
-    double toLat = locationProvider.publishToLat;
-    double toLng = locationProvider.publishToLng;
-    String publishFromLocation = locationProvider.publishFromLocation;
-    String publishToLocation = locationProvider.publishToLocation;
-    final uid = await userData.getFirebaseUid();
-    const url =
-        'https://cloths-api-backend.onrender.com/api/v1/rides/publish'; // Replace with actual IP and port
-
-    final body = {
-      "uid": uid,
-      "from": {
-        "city": publishFromLocation,
-        "location": "Hardcoded From Street",
-        "lat": fromLat,
-        "lng": fromLng
-      },
-      "to": {
-        "city": publishToLocation,
-        "location": "Hardcoded To Place",
-        "lat": toLat,
-        "lng": toLng
-      },
-      "date": formattedBackendDate,
-      "startTime": timeController.text,
-      "endTime": endtimeController,
-      "seatsAvailable": 1,
-      "pricePerSeat": double.tryParse(priceController.text) ?? 0,
-      "vehicleDetails": {
-        "type": typeController.text,
-        "plateNumber": numberController.text
-      }
-    };
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Authentication required')),
+      );
+      return;
+    }
 
     try {
+      final body = {
+        "uid": await userData.getFirebaseUid(),
+        "from": {
+          "city": locationProvider.publishFromLocation,
+          "location": "From Location", // You might want to make this dynamic
+          "lat": locationProvider.publishFromLat,
+          "lng": locationProvider.publishFromLng
+        },
+        "to": {
+          "city": locationProvider.publishToLocation,
+          "location": "To Location", // You might want to make this dynamic
+          "lat": locationProvider.publishToLat,
+          "lng": locationProvider.publishToLng
+        },
+        "date": formattedBackendDate,
+        "startTime": timeController.text,
+        "endTime": endtimeController.text, // Fixed: using .text
+        "seatsAvailable": int.tryParse(numberController.text) ??
+            1, // Assuming seats is from numberController
+        "pricePerSeat": double.tryParse(priceController.text) ?? 0.0,
+        "vehicleDetails": {
+          "type": typeController.text,
+          "plateNumber": numberController.text
+        }
+      };
+
+      print('Request body: ${jsonEncode(body)}'); // Debug logging
+
       final response = await http.post(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse(
+            'https://cloths-api-backend.onrender.com/api/v1/rides/publish'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Added auth header
+        },
         body: jsonEncode(body),
       );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Ride published successfully!')),
         );
+        // Clear form after successful submission
+        _clearForm();
       } else {
+        final errorResponse = jsonDecode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to publish: ${response.body}')),
+          SnackBar(
+              content: Text(
+                  'Failed to publish: ${errorResponse['message'] ?? response.body}')),
         );
       }
     } catch (e) {
+      print('Error publishing ride: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text('Error: ${e.toString()}')),
       );
     }
   }
 
-  Future<void> getApproxPrice() async {
+  void _clearForm() {
+    fromController.clear();
+    toController.clear();
+    dateController.clear();
+    timeController.clear();
+    endtimeController.clear();
+    priceController.clear();
+    typeController.clear();
+    numberController.clear();
+    formattedBackendDate = '';
+
+    // Clear location provider values
     final locationProvider =
         Provider.of<LocationProvider>(context, listen: false);
-
-    double fromLat = locationProvider.publishFromLat;
-    double fromLng = locationProvider.publishFromLng;
-    double toLat = locationProvider.publishToLat;
-    double toLng = locationProvider.publishToLng;
-
-    final url =
-        'https://cloths-api-backend.onrender.com/api/v1/calculate-price'; // Replace with your actual endpoint
-
-    final body = {
-      'fromLat': fromLat,
-      'fromLon': fromLng,
-      'toLat': toLat,
-      'toLon': toLng,
-    };
-
-    print(
-        'Request body: $body'); // Debug: Print the body to check the data sent
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      );
-
-      print(
-          'Response status: ${response.statusCode}'); // Debug: Print the status code
-      print(
-          'Response body: ${response.body}'); // Debug: Print the body of the response
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        print('API Response: $data'); // Debug: Print the parsed response data
-
-        if (data['price'] != null) {
-          print(
-              'Price from API: ${data['price']}'); // Debug: Print the price value
-          setState(() {
-            priceController.text = data['price'].toString();
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Price calculated successfully!')),
-          );
-        } else {
-          print('Price not found in response'); // Debug: If no price is found
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Price not found in response')),
-          );
-        }
-      } else {
-        print(
-            'Failed API call: ${response.statusCode}'); // Debug: If status code is not 200/201
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Failed to calculate price: ${response.body}')),
-        );
-      }
-    } catch (e) {
-      print('Error: $e'); // Debug: Print any error that occurs
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
-    }
+    locationProvider.updatePublishFromLocation("Select Location", 0.0, 0.0);
+    locationProvider.updatePublishToLocation("Select Location", 0.0, 0.0);
   }
 
   @override
@@ -177,7 +140,7 @@ class _PublishRidePageState extends State<PublishRidePage> {
       if (locationProvider.publishFromLocation != "Select Location" &&
           locationProvider.publishToLocation != "Select Location") {
         print('Both locations are selected, calling getApproxPrice...');
-        getApproxPrice(); // Call the API when locations are set
+        //  getApproxPrice(); // Call the API when locations are set
       }
     });
   }
@@ -191,140 +154,6 @@ class _PublishRidePageState extends State<PublishRidePage> {
           padding: const EdgeInsets.all(16.0),
           child: ListView(
             children: [
-              const Text(
-                'Where to?',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              Positioned(
-                top: MediaQuery.of(context).size.height * 0.42,
-                left: 20,
-                right: 20,
-                child: Container(
-                  height: 153,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          final result = await context.push('/mapPicker',
-                              extra: {'isFrompublishLocation': true});
-                          if (result != null &&
-                              result is Map<String, dynamic>) {
-                            Provider.of<LocationProvider>(context,
-                                    listen: false)
-                                .updatePublishFromLocation(
-                              result['locality'] ?? "Select Location",
-                              result['latitude'] ?? 0.0,
-                              result['longitude'] ?? 0.0,
-                            );
-                          }
-                        },
-                        child: Consumer<LocationProvider>(
-                            builder: (context, locationProvider, child) {
-                          return Container(
-                            height: 47,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                Image.asset('assets/images/from.png',
-                                    width: 24),
-                                const SizedBox(width: 8),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Text("FROM:",
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.grey)),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      locationProvider.publishFromLocation,
-                                      style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                      ),
-                      SizedBox(height: 10),
-                      GestureDetector(
-                        onTap: () async {
-                          final result = await context.push('/mapPicker',
-                              extra: {'isToPublishLocation': true});
-                          if (result != null &&
-                              result is Map<String, dynamic>) {
-                            Provider.of<LocationProvider>(context,
-                                    listen: false)
-                                .updatePublishToLocation(
-                              result['locality'] ?? "Select Location",
-                              result['latitude'] ?? 0.0,
-                              result['longitude'] ?? 0.0,
-                            );
-                          }
-                        },
-                        child: Consumer<LocationProvider>(
-                            builder: (context, locationProvider, child) {
-                          return Container(
-                            height: 47,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                Image.asset('assets/images/to.png', width: 24),
-                                const SizedBox(width: 8),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Text("TO:",
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.grey)),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      locationProvider.publishToLocation,
-                                      style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                ),
-              ),
               const SizedBox(height: 16),
               GestureDetector(
                 onTap: () async {

@@ -6,9 +6,11 @@ import 'package:agronomist_partner/pages/editprofile.dart';
 import 'package:agronomist_partner/pages/login.dart';
 
 import 'package:agronomist_partner/pages/mainpage.dart';
+import 'package:agronomist_partner/pages/ownerprofile.dart';
 import 'package:agronomist_partner/pages/profilemenu.dart';
 import 'package:agronomist_partner/pages/profilepage.dart';
 import 'package:agronomist_partner/pages/publish/publishride.dart';
+import 'package:agronomist_partner/pages/publish/publishrideselect.dart';
 import 'package:agronomist_partner/pages/publish/yourrides.dart';
 import 'package:agronomist_partner/pages/searchpage.dart';
 
@@ -84,7 +86,7 @@ final GoRouter router = GoRouter(
         ),
         GoRoute(
           path: '/publish',
-          builder: (context, state) => PublishRidePage(),
+          builder: (context, state) => PublishRideSelectPage(),
         ),
         GoRoute(
           path: '/rides',
@@ -104,6 +106,10 @@ final GoRouter router = GoRouter(
       builder: (context, state) => ProfileMenu(),
     ),
     GoRoute(
+      path: '/publishride',
+      builder: (context, state) => PublishRidePage(),
+    ),
+    GoRoute(
       path: '/editprofile',
       builder: (context, state) => EditProfileScreen(),
     ),
@@ -114,6 +120,14 @@ final GoRouter router = GoRouter(
         return BookingScreen(ride: ride);
       },
     ),
+    GoRoute(
+  path: '/ownerprofile',
+  builder: (context, state) {
+    final ride = state.extra as Map<String, dynamic>;
+    return DriverProfilePage(ride: ride);
+  },
+),
+
   ],
 );
 
